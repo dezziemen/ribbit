@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('partials/header.ejs', { title: 'Login to Ribbit' }); %>
+    </head>
+    <body class="">
+        <%- include('partials/navbar.ejs'); %>
+        <form class="mb-3" method="post">
+            <div class="row">
+                <div class="col-3"></div>
+                <div class="col-6 m-5">
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Username or Email address</label>
+                        <input type="text" class="form-control" id="userEmail" name="userEmail" value="<%= userEmail %>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                    <% if (error && error.credentialsError) { %>
+                        <div id="credentialsError" class="form-text">Invalid credentials</div>
+                    <% } %>
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </div>
+                <div class="col-3"></div>
+            </div>
+        </form>
+    </body>
+</html>

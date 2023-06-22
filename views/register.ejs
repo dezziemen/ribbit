@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('partials/header.ejs', { title: 'Create an account on Ribbit' }); %>
+    </head>
+    <body class="">
+        <%- include('partials/navbar.ejs'); %>
+        <form class="mb-3" method="post">
+            <div class="row">
+                <div class="col-3"></div>
+                <div class="col-6 m-5">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email" value="<%= email %>">
+                        <% if (error && error.email) { %>
+                            <div id="emailError" class="form-text">Email address is already registered.</div>
+                        <% } %>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="<%= username %>">
+                        <% if (error && error.username) { %>
+                            <div id="usernameError" class="form-text">Username is already taken.</div>
+                        <% } %>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+                <div class="col-3"></div>
+            </div>
+        </form>
+    </body>
+</html>
