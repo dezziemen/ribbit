@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
     <head>
         <%- include('partials/header.ejs', { title: 'Login to Ribbit' }); %>
     </head>
-    <body class="">
-        <%- include('partials/navbar.ejs'); %>
+    <body>
         <form class="mb-3" method="post">
             <div class="row">
                 <div class="col-3"></div>
@@ -25,5 +24,6 @@
                 <div class="col-3"></div>
             </div>
         </form>
+        <%- include('partials/scripts.ejs'); %>
     </body>
 </html>

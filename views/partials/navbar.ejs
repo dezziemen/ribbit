@@ -1,5 +1,19 @@
-<nav class="navbar bg-dark">
+<nav class="navbar">
     <div class="container-fluid">
         <a class="navbar-brand text-light" href="/">Ribbit</a>
+        <% if (locals.user) { %>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" type="button" aria-expanded="false">
+                    <%- user.username %>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/u/<%- user.username %>">My Profile</a></li>
+                    <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        <% } else { %>
+            <a class="btn btn-secondary" href="/login" id="loginButton">Login</a>
+        <% } %>
     </div>
 </nav>

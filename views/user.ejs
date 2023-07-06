@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
     <head>
         <%- include('partials/header.ejs', { title: user.username }); %>
     </head>
@@ -7,5 +7,6 @@
         <%- user.username %>
         <br>
         <%- user.bio %>
+        <%- include('partials/scripts.ejs'); %>
     </body>
 </html>
