@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <%- include('partials/header.ejs', { title: 'Ribbit: Create post' }) %>
+    </head>
+    <body>
+        <%- include('partials/navbar.ejs') %>
+        <div class="container-sm m-5">
+            <div class="card">
+                <form action="" method="post">
+                    <div class="card-header">Create a post</div>
+                    <div class="card-body">
+                        <label for="postTitle" class="form-label">Post title</label>
+                        <input type="text" class="form-control" id="postTitle" name="postTitle">
+                        <label for="postBody" class="form-label">Post body</label>
+                        <textarea class="form-control" id="postBody" name="postBody" cols="30" rows="10"></textarea>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Submit post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <%- include('partials/createPostModal.ejs'); %>
+        <%- include('partials/createTopicModal.ejs'); %>
+        <%- include('partials/scripts.ejs') %>
+    </body>
+</html>

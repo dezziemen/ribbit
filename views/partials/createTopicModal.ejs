@@ -1,0 +1,20 @@
+<div class="modal fade" id="createTopicModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="createTopicModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="/topic" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="createTopicModalLabel">Create a topic</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                        <label for="topicName" class="form-label">Topic</label>
+                        <input type="text" class="form-control" id="topicName" name="topicName">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

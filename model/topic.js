@@ -1,15 +1,22 @@
 const mongoose = require('mongoose');
-const Post = require('/model/post')
 
 const topicSchema = new mongoose.Schema({
-    post: {
+    name: {
+        type: String,
+        required: true,
+    },
+    post: [{
         type: Number,
         required: false,
-    },
+    }],
     wiki: {
         type: String,
         required: false,
     },
+    creator: {
+        type: mongoose.ObjectId,
+        required: true,
+    }
 }, {
     timestamps: true
 });

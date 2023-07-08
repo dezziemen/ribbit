@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <%- include('partials/header.ejs', { title: 'Ribbit: ' + topic.name }) %>
+    </head>
+    <body>
+        <%- include('partials/navbar.ejs') %>
+        <div class="container row">
+            <div class="col-9">
+                <a class="btn btn-primary" id="createPostButton" href="/post"><i class="bi bi-plus-lg"></i> Create post</a>
+                <div class="col">
+                    <% topic.post.forEach((post, index) => { %>
+                        <%- include('partials/postCard.ejs', { post }) %>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+        <%- include('partials/createTopicModal.ejs'); %>
+        <%- include('partials/scripts.ejs') %>
+    </body>
+</html>

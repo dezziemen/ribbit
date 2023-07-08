@@ -1,19 +1,27 @@
 const mongoose = require('mongoose');
-const User = require('/model/user');
 
 const postSchema = new mongoose.Schema({
-    topicId: {
-        type: Number,
-        required: true,
-    },
     content: {
-        type: String,
-        required: true,
+        title: {
+            type: String,
+            required: true,
+        },
+        body: {
+            type: String,
+            required: false,
+        },
+        // media: {
+        //
+        // }
     },
     author: {
-        type: Number,
+        type: mongoose.ObjectId,
         required: true,
     },
+    // topic: {
+    //     type: mongoose.ObjectId,
+    //     required: true
+    // },
 }, {
         timestamps: true,
     });

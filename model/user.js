@@ -23,6 +23,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    subscribed: [mongoose.ObjectId],
+    settings: {
+        darkMode: {
+            type: Boolean,
+            default: true,
+        },
+    }
 }, {
     timestamps: true,
 });
