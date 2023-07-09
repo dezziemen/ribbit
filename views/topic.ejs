@@ -8,6 +8,11 @@
         <div class="container row">
             <div class="col-9">
                 <a class="btn btn-primary" id="createPostButton" href="/post"><i class="bi bi-plus-lg"></i> Create post</a>
+                <% if (user.subscribed.includes(topic._id)) { %>
+                    <button type="button" class="btn btn-secondary" id="btnUnsubscribeTopic" onclick="unsubscribe('<%- topic.name %>')">Subscribed</button>
+                <% } else { %>
+                    <button type="button" class="btn btn-warning" id="btnSubscribeTopic" onclick="subscribe('<%- topic.name %>')">Subscribe</button>
+                <% } %>
                 <div class="col">
                     <% topic.post.forEach((post, index) => { %>
                         <%- include('partials/postCard.ejs', { post }) %>
@@ -16,6 +21,9 @@
             </div>
         </div>
         <%- include('partials/createTopicModal.ejs'); %>
-        <%- include('partials/scripts.ejs') %>
+        <%- include('partials/scripts.ejs'); %>
+        <script>
+            <%- include('../public/javascripts/subscribeTopic.js'); %>
+        </script>
     </body>
 </html>

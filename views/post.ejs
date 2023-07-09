@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
     <head>
-        <%- include('partials/header.js', { title: post.content.title }) %>
+        <%- include('partials/header.ejs', { title: post.content.title }) %>
     </head>
     <body>
         <%- include('partials/navbar.ejs') %>
-        <div class="card">
-            <div class="card-header">
-                <% if (post.content.title) { %>
-                    <%- post.content.title %>
-                <% } %>
-            </div>
-            <div class="card-body">
-                <%- if (post.content.body) { %>
-                    <%- post.content.body %>
-                <%- } %>
+        <div class="container-sm m-5">
+            <div class="card">
+                <div class="card-header">
+                    <% if (post.content.title) { %>
+                        <%- post.content.title %>
+                    <% } %>
+                </div>
+                <div class="card-body">
+                    <% if (post.content.body) { %>
+                        <%- post.content.body %>
+                    <% } %>
+                </div>
+                <div class="card-footer">
+                    <% if (post.upvote && post.downvote) { %>
+                        <button class="btn" name="btnUpvote" id="btnUpvote"><i class="bi bi-arrow-up"></i></button><%- post.upvote.count %>
+                        <br>
+                        <button class="btn" name="btnDownvote" id="btnDownvote"><i class="bi bi-arrow-down"></i></button><%- post.downvote.count %>
+                    <% } %>
+                </div>
             </div>
         </div>
         <%- include('partials/createTopicModal.ejs'); %>
-        <%- include('partials/scrips.ejs') %>
+        <%- include('partials/scripts.ejs') %>
+        <script>
+            <%- include('../public/javascripts/votePost.js'); %>
+        </script>
     </body>
 </html>

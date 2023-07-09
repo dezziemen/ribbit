@@ -24,6 +24,22 @@ const userSchema = new mongoose.Schema({
         required: false,
     },
     subscribed: [mongoose.ObjectId],
+    upvote: [{
+        post: {
+            type: mongoose.ObjectId,
+        },
+        time: {
+            type: Date,
+        }
+    }],
+    downvote: [{
+        post: {
+            type: mongoose.ObjectId,
+        },
+        time: {
+            type: Date,
+        }
+    }],
     settings: {
         darkMode: {
             type: Boolean,

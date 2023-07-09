@@ -18,10 +18,26 @@ const postSchema = new mongoose.Schema({
         type: mongoose.ObjectId,
         required: true,
     },
-    // topic: {
-    //     type: mongoose.ObjectId,
-    //     required: true
-    // },
+    topic: {
+        type: mongoose.ObjectId,
+        required: true
+    },
+    upvote: {
+        count: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        user: [mongoose.ObjectId]
+    },
+    downvote: {
+        count: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        user: [mongoose.ObjectId]
+    }
 }, {
         timestamps: true,
     });
