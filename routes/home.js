@@ -15,11 +15,12 @@ function hash(string) {
 /* GET home page. */
 router.get('/', async (req, res, next) => {
     const user = await User.findById(req.session.userId).exec();
+    const topics = await Topic.find();
     // If logged in
     if (user) {
-        res.render('home', { title: 'Ribbit', user });
+        res.render('home', { title: 'Ribbit', user, topics });
     } else {
-        res.render('home', { title: 'Ribbit' });
+        res.render('home', { title: 'Ribbit', topics });
     }
 });
 
@@ -205,19 +206,39 @@ router.get('/t/:topicName/:postId', getUser, async (req, res) => {
 
 router.post('/t/:topicName/subscribe', getUser, async (req, res) => {
     const { topicName } = req.params;
-    console.log('Subscribe success');
     const user = res.locals.user;
     const topic = await Topic.findOne({
         name: topicName
     }).exec();
     if (!user.subscribed.includes(topic._id)) {
         user.subscribed.push(topic);
+        console.log('Subscribe success');
         console.log(`User subscribed updated: ${ user.subscribed }`);
         user.save();
     }
     else {
         console.log(`User already subscribed to ${ topic.name }`);
     }
+    res.json({ subscribed: user.subscribed.includes(topic._id) });
+});
+
+router.post('/t/:topicName/unsubscribe', getUser, async (req, res) => {
+    const { topicName } = req.params;
+    const user = res.locals.user;
+    const topic = await Topic.findOne({
+        name: topicName
+    }).exec();
+    if (user.subscribed.includes(topic._id)) {
+        const index = user.subscribed.indexOf(topic._id);
+        user.subscribed.splice(index, 1);
+        console.log('Unsubscribe success');
+        console.log(`User subscribed updated: ${ user.subscribed }`);
+        user.save();
+    }
+    else {
+        console.log(`User already unsubscribed to ${ topic.name }`);
+    }
+    res.json({ subscribed: user.subscribed.includes(topic._id) });
 });
 
 module.exports = router;
