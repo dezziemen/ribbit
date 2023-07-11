@@ -11,30 +11,30 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    password: {
-        type: String,
-        required: true,
-    },
-    salt: {
-        type: String,
-        required: true,
-    },
     bio: {
         type: String,
         required: false,
     },
     subscribed: [mongoose.ObjectId],
-    upvote: [{
+    postVote: [{
         post: {
             type: mongoose.ObjectId,
+        },
+        direction: {
+            type: String,
+            required: true,
         },
         time: {
             type: Date,
         }
     }],
-    downvote: [{
-        post: {
+    commentVote: [{
+        comment: {
             type: mongoose.ObjectId,
+        },
+        direction: {
+            type: String,
+            required: true,
         },
         time: {
             type: Date,

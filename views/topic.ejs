@@ -8,13 +8,12 @@
         <div class="container row">
             <div class="col-9">
                 <a class="btn btn-primary" id="createPostButton" href="/post"><i class="bi bi-plus-lg"></i> Create post</a>
-                <% var subscribed = user.subscribed.includes(topic._id); %>
                 <button type="button" class="btn btn-secondary" id="btnUnsubscribeTopic" onclick="unsubscribe('<%- topic.name %>')"
-                <% if (!subscribed) { %>
+                <% if (!isSubscribed) { %>
                     hidden
                 <% } %>>Subscribed</button>
                 <button type="button" class="btn btn-warning" id="btnSubscribeTopic" onclick="subscribe('<%- topic.name %>')"
-                <% if (subscribed) { %>
+                <% if (isSubscribed) { %>
                     hidden
                 <% } %>>Subscribe</button>
                 <div class="col">

@@ -1,14 +1,14 @@
 <nav class="navbar">
     <div class="container-fluid">
         <a class="navbar-brand text-light" href="/">Ribbit</a>
-        <% if (locals.user) { %>
+        <% if (locals.username) { %>
             <div class="dropdown">
                 <button class="btn btn-secondary" id="createTopicButton" data-bs-toggle="modal" data-bs-target="#createTopicModal"><i class="bi bi-plus-lg"></i> Create topic</button>
                 <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <%- user.username %>
+                    <%- username %>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/u/<%- user.username %>">My Profile</a></li>
+                    <li><a class="dropdown-item" href="/u/<%- username %>">My Profile</a></li>
                     <li><a class="dropdown-item" href="/settings">Settings</a></li>
                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                 </ul>
