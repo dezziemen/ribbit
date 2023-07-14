@@ -4,6 +4,7 @@
         <%- include('partials/header.ejs', { title: 'Login to Ribbit' }); %>
     </head>
     <body>
+        <%- include('partials/navbar.ejs'); %>
         <form class="mb-3" method="post">
             <div class="row">
                 <div class="col-3"></div>
@@ -20,6 +21,9 @@
                         <div id="credentialsError" class="form-text">Invalid credentials</div>
                     <% } %>
                     <button type="submit" class="btn btn-primary">Log in</button>
+                    <div class="text-center m-3 fw-lighter">
+                        Don't have an account?<br><a href="/register">Sign up</a> here.
+                    </div>
                 </div>
                 <div class="col-3"></div>
             </div>

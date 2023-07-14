@@ -10,12 +10,23 @@
                 <form action="" method="post">
                     <div class="card-header">Create a post</div>
                     <div class="card-body">
-                        <label for="topicName" class="form-label">Topic</label>
-                        <input type="text" class="form-control" id="topicName" name="topicName">
-                        <label for="postTitle" class="form-label">Post title</label>
-                        <input type="text" class="form-control" id="postTitle" name="postTitle">
-                        <label for="postBody" class="form-label">Post body</label>
-                        <textarea class="form-control" id="postBody" name="postBody" cols="30" rows="10"></textarea>
+                        <div class="mb-3">
+                            <label for="topicName" class="form-label">Topic</label>
+                            <select name="topicName" id="topicName" class="form-select">
+                                <option selected>Choose a topic</option>
+                                <% topics.forEach((topic, index) => { %>
+                                    <option value="<%- topic.name %>">/t/<%- topic.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="postTitle" class="form-label">Post title</label>
+                            <input type="text" class="form-control" id="postTitle" name="postTitle">
+                        </div>
+                        <div class="mb-3">
+                            <label for="postBody" class="form-label">Post body</label>
+                            <textarea class="form-control" id="postBody" name="postBody" cols="30" rows="10"></textarea>
+                        </div>
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">Submit post</button>

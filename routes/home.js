@@ -8,7 +8,6 @@ const getUser = require('./middlewares/getUser');
 // Models
 const User = require('../model/user');
 const UserCredentials = require('../model/userCredentials');
-const Sessions = require('../model/sessions');
 const Topic = require('../model/topic');
 const Post = require('../model/post');
 
@@ -18,7 +17,7 @@ function hash(string) {
 
 // GET home page.
 router.get('/', getUser, async (req, res, next) => {
-    const user = await User.findOne({ username: res.locals.username });
+    const user = await User.findOne({ username: req.session.username });
     const topics = await Topic.find();
     // If logged in
     if (user) {
@@ -65,7 +64,13 @@ router.post('/register', async (req, res) => {
 // GET login page
 router.get('/login', (req, res) => {
     const error = {};
-    res.render('login', { error, username: '' })
+    // Redirect to home if user is already logged in
+    if (typeof req.session.username !== 'undefined') {
+        res.redirect('/');
+    }
+    else {
+        res.render('login', { error, username: '' })
+    }
 });
 
 // POST login page
@@ -85,13 +90,13 @@ router.post('/login', async (req, res) => {
             if (loginUser.password === password) {
                 console.log(`User ${ username } logged in`);
                 const nonce = randomBytes(16).toString('hex');
-                const cookie = hash(username + nonce);
-                const session = await Sessions.create({
-                    username,
-                    nonce,
-                    cookie
-                });
-                req.session.session = cookie;
+                // const cookie = username
+                // const session = await Sessions.create({
+                //     username,
+                //     nonce,
+                //     cookie
+                // });
+                req.session.username = username;
                 return res.redirect('/');
             }
             // Password not match
@@ -120,7 +125,7 @@ router.get('/logout', async (req, res) => {
 // GET topic
 router.get('/t/:topic', getUser, async (req, res) => {
     const topicName = req.params.topic;
-    const user = await User.findOne({ username: res.locals.username });
+    const user = await User.findOne({ username: req.session.username });
     try {
         const topic = await Topic.findOne({
             name: topicName
@@ -136,7 +141,7 @@ router.get('/t/:topic', getUser, async (req, res) => {
 // POST topic
 router.post('/topic', getUser, async (req, res) => {
     const { topicName } = req.body;
-    const user = await User.findOne({ username: res.locals.username });
+    const user = await User.findOne({ username: req.session.username });
     const error = {};
 
     console.log(`Topic created: ${ topicName }`);
@@ -156,15 +161,22 @@ router.post('/topic', getUser, async (req, res) => {
 
 // GET post creation
 router.get('/post', getUser, async (req, res) => {
-    const username = res.locals.username;
-    res.render('createPost', { username });
+    const username = req.session.username;
+    const user = await User.findOne({ username });
+    const topics = await Topic.find({
+        '_id': {
+            $in: user.subscribed
+        }
+    }, { name: 1, _id: 0 });
+    console.log(topics);
+    res.render('createPost', { username, topics });
 });
 
 // POST post creation
 router.post('/post', getUser, async (req, res) => {
     const { topicName, postTitle, postBody } = req.body;
     try {
-        const user = await User.findOne({ username: res.locals.username });
+        const user = await User.findOne({ username: req.session.username });
         const topic = await Topic.findOne({
             name: topicName
         });
@@ -194,7 +206,7 @@ router.post('/post', getUser, async (req, res) => {
 // GET post
 router.get('/t/:topicName/:postId', getUser, async (req, res) => {
     const { topicName, postId } = req.params;
-    const user = res.locals.user;
+    const user = req.session.user;
     try {
         const post = await Post.findById(postId).exec();
         const topic = await Topic.findOne({
@@ -217,7 +229,7 @@ router.get('/t/:topicName/:postId', getUser, async (req, res) => {
 // POST user click subscribe button
 router.post('/t/:topicName/subscribe', getUser, async (req, res) => {
     const { topicName } = req.params;
-    const user = await User.findOne({ username: res.locals.username });
+    const user = await User.findOne({ username: req.session.username });
     const topic = await Topic.findOne({
         name: topicName
     }).exec();
@@ -235,7 +247,7 @@ router.post('/t/:topicName/subscribe', getUser, async (req, res) => {
 // POST user click unsubscribe button
 router.post('/t/:topicName/unsubscribe', getUser, async (req, res) => {
     const { topicName } = req.params;
-    const user = await User.findOne({ username: res.locals.username });
+    const user = await User.findOne({ username: req.session.username });
     const topic = await Topic.findOne({
         name: topicName
     }).exec();

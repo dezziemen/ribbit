@@ -5,6 +5,7 @@ const path = require('path');
 const session = require('express-session');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const mongoSession = require('connect-mongo');
 const config = require('dotenv').config();
 // var indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -45,9 +46,15 @@ app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.use(session({
   name: SESSION_NAME,
   secret: SESSION_SECRET,
+  store: mongoSession.create({
+      mongoUrl: DATABASE_URL,
+      autoRemove: 'native',
+      collectionName: 'sessions',
+  }),
   cookie: {
     maxAge: Number(SESSION_TIMEOUT),
     sameSite: true,
