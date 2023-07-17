@@ -13,7 +13,7 @@
                         <div class="mb-3">
                             <label for="topicName" class="form-label">Topic</label>
                             <select name="topicName" id="topicName" class="form-select">
-                                <option selected>Choose a topic</option>
+                                <option selected disabled>Choose a topic</option>
                                 <% topics.forEach((topic, index) => { %>
                                     <option value="<%- topic.name %>">/t/<%- topic.name %></option>
                                 <% }); %>

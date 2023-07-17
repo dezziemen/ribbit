@@ -5,6 +5,9 @@
     </head>
     <body>
         <%- include('partials/navbar.ejs') %>
+        <div class="m-5">
+            <a href="/t/<%- topic.name %>"><h1><%- topic.name %></h1></a>
+        </div>
         <div class="container-sm m-5">
             <div class="card">
                 <div class="card-header">
@@ -18,13 +21,18 @@
                     <% } %>
                 </div>
                 <div class="card-footer">
-                    <% if (post.upvote && post.downvote) { %>
-                        <button class="btn" name="btnUpvote" id="btnUpvote"><i class="bi bi-arrow-up"></i></button><%- post.upvote.count %>
+                    <% if (post.vote) { %>
+                        <% const upvotes = post.vote.filter(vote => vote.direction === 'up').length; %>
+                        <% const downvotes = post.vote.filter(vote => vote.direction === 'down').length; %>
+                        <button class="btn" name="btnUpvote" id="btnUpvote" onclick="upvote('<%- post._id %>')"><i class="bi bi-arrow-up"></i></button><%- upvotes %>
                         <br>
-                        <button class="btn" name="btnDownvote" id="btnDownvote"><i class="bi bi-arrow-down"></i></button><%- post.downvote.count %>
+                        <button class="btn" name="btnDownvote" id="btnDownvote" onclick="downvote('<%- post._id %>')"><i class="bi bi-arrow-down"></i></button><%- downvotes %>
                     <% } %>
                 </div>
             </div>
+        </div>
+        <div class="m-5">
+
         </div>
         <%- include('partials/createTopicModal.ejs'); %>
         <%- include('partials/scripts.ejs') %>

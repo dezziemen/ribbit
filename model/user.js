@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        immutable: true,
     },
     email: {
         type: String,
@@ -15,30 +17,39 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    subscribed: [mongoose.ObjectId],
-    postVote: [{
-        post: {
-            type: mongoose.ObjectId,
-        },
-        direction: {
-            type: String,
-            required: true,
-        },
-        time: {
-            type: Date,
-        }
+    post: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Post',
     }],
+    comment: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+    }],
+    subscribed: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Topic',
+    }],
+    postVote: [{
+        type: Schema.Types.ObjectId,
+        ref: 'PostVote'
+    }],
+        // post: {
+        //     type: Post,
+        //     required: true,
+        // },
+        // direction: {
+        //     type: String,
+        //     required: true,
+        // },
+        // time: {
+        //     type: Date,
+        //     required: true,
+        //     default: Date.now(),
+        // }
+    // }],
     commentVote: [{
-        comment: {
-            type: mongoose.ObjectId,
-        },
-        direction: {
-            type: String,
-            required: true,
-        },
-        time: {
-            type: Date,
-        }
+        type: Schema.Types.ObjectId,
+        ref: 'CommentVote'
     }],
     settings: {
         darkMode: {

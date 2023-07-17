@@ -1,6 +1,14 @@
-<div class="card mb-3" style="width: 18rem;">
+<div class="card border-secondary mb-3" style="width: 18rem;">
     <div class="card-body">
-        <h5 class="card-title"><%- post.content.title %></h5>
-        <p class="card-text"><%- post.content.body %></p>
+        <div class="card-subtitle mb-2">
+            <a href="/t/<%- topic.name %>">/t/<%- topic.name %></a>
+            &middot; <span><small class="text-body-secondary">Posted by <a
+                            href="/u/<%- username %>">/u/<%- username %></a></small></span>
+        </div>
+        <div style="transform: rotate(0);">
+            <h5 class="card-title"><%- post.content.title %></h5>
+            <p class="card-text"><%- post.content.body %></p>
+            <a href="/t/<%- topic.name %>/<%- post._id %>" class="stretched-link"></a>
+        </div>
     </div>
 </div>

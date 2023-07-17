@@ -1,26 +1,29 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const { Schema } = require("mongoose");
 
 const topicSchema = new Schema({
-    name: {
+    content: {
         type: String,
         required: true,
-        unique: true,
     },
+    replyTo: {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+    },
+    replies: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+    }],
     post: [{
         type: Schema.Types.ObjectId,
         ref: 'Post',
-        required: false
+        required: true
     }],
-    wiki: {
-        type: String,
-        required: false,
-    },
-    subscribers: [{
+    vote: [{
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'CommentVote',
     }],
-    creator: {
+    author: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,

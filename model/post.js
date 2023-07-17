@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const postSchema = new mongoose.Schema({
+const postSchema = new Schema({
     content: {
         title: {
             type: String,
@@ -15,29 +16,23 @@ const postSchema = new mongoose.Schema({
         // }
     },
     author: {
-        type: mongoose.ObjectId,
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     topic: {
-        type: mongoose.ObjectId,
+        type: Schema.Types.ObjectId,
+        ref: 'Topic',
         required: true
     },
-    upvote: {
-        count: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        user: [mongoose.ObjectId]
-    },
-    downvote: {
-        count: {
-            type: Number,
-            required: true,
-            default: 0,
-        },
-        user: [mongoose.ObjectId]
-    }
+    vote: [{
+        type: Schema.Types.ObjectId,
+        ref: 'PostVote',
+    }],
+    comment: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+    }],
 }, {
         timestamps: true,
     });

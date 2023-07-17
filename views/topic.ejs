@@ -5,8 +5,11 @@
     </head>
     <body>
         <%- include('partials/navbar.ejs') %>
-        <div class="container row">
-            <div class="col-9">
+        <div class="my-6">
+            <h1 class="ms-3"><%- topic.name %></h1>
+        </div>
+        <div class="mb-3 ms-3">
+            <div>
                 <a class="btn btn-primary" id="createPostButton" href="/post"><i class="bi bi-plus-lg"></i> Create post</a>
                 <button type="button" class="btn btn-secondary" id="btnUnsubscribeTopic" onclick="unsubscribe('<%- topic.name %>')"
                 <% if (!isSubscribed) { %>
@@ -16,12 +19,12 @@
                 <% if (isSubscribed) { %>
                     hidden
                 <% } %>>Subscribe</button>
-                <div class="col">
-                    <% topic.post.forEach((post, index) => { %>
-                        <%- include('partials/postCard.ejs', { post }) %>
-                    <% }); %>
-                </div>
             </div>
+        </div>
+        <div class="ms-3 col">
+            <% posts.forEach((post) => { %>
+                <%- include('partials/postCard.ejs', { post }) %>
+            <% }); %>
         </div>
         <%- include('partials/createTopicModal.ejs'); %>
         <%- include('partials/scripts.ejs'); %>

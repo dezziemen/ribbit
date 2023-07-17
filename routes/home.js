@@ -6,6 +6,7 @@ const loggedIn = require('./middlewares/loggedIn');
 const getUser = require('./middlewares/getUser');
 
 // Models
+const PostVote = require('../model/postVote');
 const User = require('../model/user');
 const UserCredentials = require('../model/userCredentials');
 const Topic = require('../model/topic');
@@ -131,7 +132,13 @@ router.get('/t/:topic', getUser, async (req, res) => {
             name: topicName
         });
         const isSubscribed = user.subscribed.includes(topic._id);
-        res.render('topic', { topic, username: user.username, isSubscribed });
+        const posts = await Post.find({
+            '_id': {
+                $in: topic.post
+            }
+        });
+        console.log(posts);
+        res.render('topic', { topic, username: user.username, isSubscribed, posts });
     } catch (err) {
         console.error(`Topic ${ topicName } not found.`);
         res.sendStatus(404);
@@ -175,6 +182,9 @@ router.get('/post', getUser, async (req, res) => {
 // POST post creation
 router.post('/post', getUser, async (req, res) => {
     const { topicName, postTitle, postBody } = req.body;
+    if (topicName === '') {
+        console.log(`Select a topic...`);
+    }
     try {
         const user = await User.findOne({ username: req.session.username });
         const topic = await Topic.findOne({
@@ -193,11 +203,13 @@ router.post('/post', getUser, async (req, res) => {
                 topic,
                 author: user
             });
+            topic.post.push(post._id);
+            topic.save();
             console.log(`Request created: ${ postTitle }, ${ postBody }`);
             res.redirect(`/t/${ topic.name }/${ post._id }`);
         }
     } catch (err) {
-        console.error(`Post can not be created.`);
+        console.error(`Post can not be created. ${ err }`);
         res.sendStatus(500);
     }
 
@@ -208,13 +220,12 @@ router.get('/t/:topicName/:postId', getUser, async (req, res) => {
     const { topicName, postId } = req.params;
     const user = req.session.user;
     try {
-        const post = await Post.findById(postId).exec();
+        const post = await Post.findById(postId);
         const topic = await Topic.findOne({
             name: topicName
-        });
+        }, { name: 1 });
         if (toString(post.topic) === toString(topic._id)) {
-            console.log(`Post found: ${ post }`);
-            res.render('post', { post, user });
+            res.render('post', { post, user, topic });
         }
         else {
             console.log(`Wrong topic: ${ post }`);
@@ -232,7 +243,7 @@ router.post('/t/:topicName/subscribe', getUser, async (req, res) => {
     const user = await User.findOne({ username: req.session.username });
     const topic = await Topic.findOne({
         name: topicName
-    }).exec();
+    });
     if (!user.subscribed.includes(topic._id)) {
         user.subscribed.push(topic);
         console.log(`User subscribed updated: ${ user.subscribed }`);
@@ -250,7 +261,7 @@ router.post('/t/:topicName/unsubscribe', getUser, async (req, res) => {
     const user = await User.findOne({ username: req.session.username });
     const topic = await Topic.findOne({
         name: topicName
-    }).exec();
+    });
     if (user.subscribed.includes(topic._id)) {
         const index = user.subscribed.indexOf(topic._id);
         user.subscribed.splice(index, 1);
@@ -261,6 +272,38 @@ router.post('/t/:topicName/unsubscribe', getUser, async (req, res) => {
         console.log(`User already unsubscribed to ${ topic.name }`);
     }
     res.json({ subscribed: user.subscribed.includes(topic._id) });
+});
+
+// POST user upvote post
+router.post('/t/:topicName/:postId/upvote', getUser, async (req, res) => {
+    const post = await Post.findById(req.params.postId);
+    let user = await User.findOne({ username: req.session.username }).populate({ path: 'postVote', model: PostVote }).exec();
+
+    if (user.postVote.findIndex(x => x.post.equals(post._id)) === -1) {
+        const postVote = await PostVote.create({
+            post,
+            user,
+            direction: 'up',
+        });
+        user.postVote.push(postVote);
+        post.vote.push(postVote);
+        user.save();
+        post.save();
+    }
+    else {
+        const postVote = await PostVote.findOne({ post: post._id });
+        user.postVote.pull(postVote);
+        post.vote.pull(postVote);
+        await PostVote.findOneAndDelete({ post: post._id });
+        user.save();
+        post.save();
+    }
+});
+
+// POST user downvote post
+router.post('/t/:topicName/:postId/downvote', getUser, async (req, res) => {
+    const post = await Post.findById(req.params.postId);
+    let user = await User.findOne({ username: req.session.username });
 });
 
 module.exports = router;
