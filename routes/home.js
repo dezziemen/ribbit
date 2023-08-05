@@ -4,6 +4,11 @@ const { createHash, randomBytes } = require('crypto');
 const router = express.Router();
 const loggedIn = require('./middlewares/loggedIn');
 const getUser = require('./middlewares/getUser');
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+});
+const helper = require('../public/javascripts/helper');
 
 // Models
 const PostVote = require('../model/postVote');
@@ -11,6 +16,7 @@ const User = require('../model/user');
 const UserCredentials = require('../model/userCredentials');
 const Topic = require('../model/topic');
 const Post = require('../model/post');
+const Comment = require('../model/comment');
 
 function hash(string) {
     return createHash('sha256').update(string).digest('hex');
@@ -218,21 +224,41 @@ router.post('/post', getUser, async (req, res) => {
 // GET post
 router.get('/t/:topicName/:postId', getUser, async (req, res) => {
     const { topicName, postId } = req.params;
-    const user = req.session.user;
     try {
-        const post = await Post.findById(postId);
+        const user = await User.findOne({ username: req.session.username })
+        const post = await Post.findById(postId).populate({
+            path: 'vote',
+            model: 'PostVote',
+            select: 'direction',
+        });
         const topic = await Topic.findOne({
             name: topicName
         }, { name: 1 });
-        if (toString(post.topic) === toString(topic._id)) {
-            res.render('post', { post, user, topic });
+        const postVote = await PostVote.findOne({
+            post: post._id,
+            user: user._id,
+        });
+        const comments = await Comment.find({
+            replyTo: {
+                $exists: false
+            }
+        });
+        console.log(comments);
+        // TODO: Figure out a way to make checkbox checked on page load
+
+        const vote = { voteDirection: '' };
+        if (postVote) {
+            vote['voteDirection'] = postVote.direction;
+        }
+        if (post.topic.equals(topic._id)) {
+            res.render('post', { post, user: user.username, topic, vote, comments, helper });
         }
         else {
             console.log(`Wrong topic: ${ post }`);
             res.sendStatus(404);
         }
     } catch (err) {
-        console.error(`Post ${ postId } not found.`);
+        console.error(`Post ${ postId } not found.\n${ err }`);
         res.sendStatus(404);
     }
 });
@@ -274,36 +300,136 @@ router.post('/t/:topicName/unsubscribe', getUser, async (req, res) => {
     res.json({ subscribed: user.subscribed.includes(topic._id) });
 });
 
+async function createPostVote(post, user, direction) {
+    const postVote = await PostVote.create({
+        post,
+        user,
+        direction,
+    });
+    user.postVote.push(postVote);
+    post.vote.push(postVote);
+    user.save();
+    post.save();
+}
+
+async function removePostVote(post, user) {
+    const postVote = await PostVote.findOne({ post: post._id });
+    user.postVote.pull(postVote);
+    post.vote.pull(postVote);
+    await PostVote.findOneAndDelete({ post: post._id });
+    user.save();
+    post.save();
+}
+
+async function convertVote(post, user, direction) {
+    const postVote = await PostVote.findOneAndUpdate({
+        post: post._id, user: user._id
+    }, {
+        $set:
+            {
+                direction,
+                time: Date.now()
+            }
+    });
+    postVote.save();
+}
+
 // POST user upvote post
 router.post('/t/:topicName/:postId/upvote', getUser, async (req, res) => {
     const post = await Post.findById(req.params.postId);
     let user = await User.findOne({ username: req.session.username }).populate({ path: 'postVote', model: PostVote }).exec();
+    const postIndex = user.postVote.findIndex(x => x.post.equals(post._id));
 
-    if (user.postVote.findIndex(x => x.post.equals(post._id)) === -1) {
-        const postVote = await PostVote.create({
-            post,
-            user,
-            direction: 'up',
-        });
-        user.postVote.push(postVote);
-        post.vote.push(postVote);
-        user.save();
-        post.save();
+    // If postVote does not exist, create new
+    if (postIndex === -1) {
+        await createPostVote(post, user, 'up');
+        res.json({ direction: 'up' });
     }
-    else {
-        const postVote = await PostVote.findOne({ post: post._id });
-        user.postVote.pull(postVote);
-        post.vote.pull(postVote);
-        await PostVote.findOneAndDelete({ post: post._id });
-        user.save();
-        post.save();
+    // If already upvoted, remove upvote
+    else if (user.postVote[postIndex].direction === 'up') {
+        await removePostVote(post, user);
+        res.json({ direction: '' });
+    }
+    // If already downvoted, convert to upvote
+    else if (user.postVote[postIndex].direction === 'down') {
+        await convertVote(post, user, 'up');
+        res.json({ direction: 'up' });
     }
 });
 
 // POST user downvote post
 router.post('/t/:topicName/:postId/downvote', getUser, async (req, res) => {
     const post = await Post.findById(req.params.postId);
-    let user = await User.findOne({ username: req.session.username });
+    let user = await User.findOne({ username: req.session.username }).populate({ path: 'postVote', model: PostVote }).exec();
+    const postIndex = user.postVote.findIndex(x => x.post.equals(post._id));
+
+    // If postVote does not exist, create new
+    if (postIndex === -1) {
+        await createPostVote(post, user, 'down');
+        res.json({ direction: 'down' });
+
+    }
+    // If already upvoted, remove downvote
+    else if (user.postVote[postIndex].direction === 'down') {
+        await removePostVote(post, user);
+        res.json({ direction: '' });
+    }
+    // If already upvoted, convert to downvote
+    else if (user.postVote[postIndex].direction === 'up') {
+        await convertVote(post, user, 'down');
+        res.json({ direction: 'down' });
+    }
+});
+
+router.post('/t/:topicName/:postId/comment', getUser, async (req, res) => {
+    try {
+        const topic = await Topic.findOne({ name: req.params.topicName });
+        const post = await Post.findOne({ topic, _id: req.params.postId });
+        const user = await User.findOne({ username: req.session.username });
+
+        const commentText = req.body.postComment;
+        const comment = await Comment.create({
+            content: commentText,
+            author: user,
+            post: post,
+        });
+
+        console.log(`Posted comment: ${ commentText }`);
+        res.json({ success: true, commentText });
+    } catch (err) {
+        console.error(`Unable to find post.\n${ err }`);
+        res.sendStatus(300);
+    }
+});
+
+async function getRootCommentsByPost(postId) {
+    const comments = await Comment.find({
+        post: postId,
+        replyTo: {
+            $exists: false
+        }
+    }).populate({
+        path: 'author',
+        model: 'User',
+        select: ['_id', 'username']
+    }).lean();
+    // comments?.forEach((comment, index) => {
+    //     comment["dateString"] = dateFormatter.format(Date.parse(comment["createdAt"]));
+    // });
+    return comments;
+}
+
+router.get('/commentTest', getUser, async (req, res) => {
+    const comments = await Comment.find({
+        replyTo: {
+            $exists: false
+        }
+    });
+    // comments?.forEach((comment, index) => {
+    //     comment["dateString"] = dateFormatter.format(Date.parse(comment["createdAt"]));
+    // });
+    console.log(comments);
+    res.render('commentTest', { comments });
 });
 
 module.exports = router;

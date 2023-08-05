@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const { Schema } = require("mongoose");
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+});
 
-const topicSchema = new Schema({
+const commentSchema = new Schema({
     content: {
         type: String,
         required: true,
@@ -14,11 +18,11 @@ const topicSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Comment',
     }],
-    post: [{
+    post: {
         type: Schema.Types.ObjectId,
         ref: 'Post',
         required: true
-    }],
+    },
     vote: [{
         type: Schema.Types.ObjectId,
         ref: 'CommentVote',
@@ -32,5 +36,31 @@ const topicSchema = new Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Topic', topicSchema);
+var autoPopulateChildren = function(next) {
+    this.populate('replies');
+    next();
+}
 
+var autoPopulateAuthor = function(next) {
+    this.populate({
+        path: 'author',
+        select: ['_id', 'username']
+    });
+    next();
+}
+
+var dateString = function(doc) {
+    console.log(`this: ${ doc }`);
+    console.log(`createdAt: ${ doc.createdAt }`);
+    // this.dateString = dateFormatter.format(Date.parse(this.createdAt));
+    // next();
+    // assert.ok(doc instanceof mongoose.Document);
+    doc.dateString = dateFormatter.format(Date.parse(doc.createdAt));
+}
+
+commentSchema
+    .pre(/^find/, autoPopulateChildren)
+    .pre(/^find/, autoPopulateAuthor)
+    // .post(/^find/, dateString);
+
+module.exports = mongoose.model('Comment', commentSchema);

@@ -1,9 +1,19 @@
+const btnUpvote = document.getElementById('btnUpvote');
+const btnDownvote = document.getElementById('btnDownvote');
+
 async function upvote(post) {
-    console.log(`Upvoted on ${ post }`);
-    await fetch(`/t/${topicName}/${post}/upvote`, {method: 'POST'})
+    await fetch(`/t/${ topicName }/${ post }/upvote`, { method: 'POST' })
         .then(response => {
             if (response.ok) {
-                console.log(`Upvote success`);
+                response.json().then(body => {
+                    if (body.direction === 'up') {
+                        console.log(`Upvoted ${ post }`);
+                        btnUpvote.classList.toggle('selected');
+                    }
+                    else {
+                        console.log(`Upvote removed ${ post }`);
+                    }
+                });
             }
             else {
                 throw new Error(`Upvote request failed`);
@@ -11,6 +21,21 @@ async function upvote(post) {
         });
 }
 
-function downvote(post) {
-    console.log(`Downvoted on ${ post }`);
+async function downvote(post) {
+    await fetch(`/t/${ topicName }/${ post }/downvote`, { method: 'POST' })
+        .then(response => {
+            if (response.ok) {
+                response.json().then(body => {
+                    if (body.direction === 'down') {
+                        console.log(`Downvoted ${ post }`);
+                    }
+                    else {
+                        console.log(`Downvote removed ${ post }`);
+                    }
+                });
+            }
+            else {
+                throw new Error(`Downvote request failed`);
+            }
+        });
 }

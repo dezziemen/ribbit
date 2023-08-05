@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const postUpvoteSchema = new Schema({
+const postVoteSchema = new Schema({
     post: {
         type: Schema.Types.ObjectId,
         ref: 'Post',
@@ -24,4 +24,4 @@ const postUpvoteSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('PostUpvote', postUpvoteSchema);
+module.exports = mongoose.model('PostVote', postVoteSchema);

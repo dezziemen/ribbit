@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <%- include('partials/header.ejs', { title: 'Comment testing page' }) %>
+    </head>
+    <body>
+        <%- include('partials/navbar.ejs') %>
+        <div class="container-sm m-5">
+            <% comments.forEach((comment, index) => { %>
+                <%- include('partials/comment.ejs', { comment }); %>
+            <% }); %>
+        </div>
+        <%- include('partials/scripts.ejs') %>
+    </body>
+</html>

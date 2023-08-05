@@ -1,0 +1,51 @@
+<div class="comment-thread">
+    <details class="comment" id="comment-<%- comment._id %>" open>
+        <a href="#comment-<%- comment._id %>" class="comment-border-link">
+            <span class="visually-hidden">Jump to comment-<%- comment._id %></span>
+        </a>
+        <summary>
+            <div class="comment-heading">
+                <div class="comment-info text-body-secondary">
+                    <a href="/u/<%- comment.author.username %>" class="comment-author text-reset"><%- comment.author.username %></a>
+                    <p class="m-0">
+                        <%- comment.vote.length %> point(s) &bull; <%= helper.toRelativeTime(comment.createdAt) %>
+                    </p>
+                </div>
+            </div>
+        </summary>
+        <div class="comment-body">
+            <p class="border p-2 rounded"><%- comment.content %></p>
+            <div>
+                <button type="button" class="btn border">
+                    <span aria-hidden="true">&#9650;</span>
+                    <span class="visually-hidden">Vote up</span>
+                </button>
+                <button type="button" class="btn border">
+                    <span aria-hidden="true">&#9660;</span>
+                    <span class="visually-hidden">Vote down</span>
+                </button>
+                <button type="button" class="btn border" data-bs-toggle="collapse" data-bs-target="#comment-<%- comment._id %>-collapse" aria-expanded="false" aria-controls="comment-<%- comment._id %>-collapse">Reply</button>
+                <button type="button" class="btn border">Flag</button>
+            </div>
+        </div>
+
+        <!-- Reply form start -->
+        <form action="" method="POST" class="reply-form" id="comment-<%- comment._id %>-reply-form">
+            <div class="collapse my-3 mx-5" id="comment-<%- comment._id %>-collapse">
+                <textarea class="form-control" placeholder="Reply to comment" rows="4"></textarea>
+                <br>
+                <button class="btn border" type="submit">Submit</button>
+            </div>
+        </form>
+        <!-- Reply form end -->
+
+        <div class="replies ms-4">
+            <% comment.replies.forEach((reply, index) => { %>
+                <%- include('comment.ejs', { comment: reply }); %>
+            <% }); %>
+<!--            <a href="#load-more">Load more replies</a>-->
+        </div>
+<!--        <span><small class="text-body-secondary">Posted by <a-->
+<!--                        href="/u/<%- comment.author.username %>">/u/<%- comment.author.username %></a></small></span>-->
+    </details>
+</div>
